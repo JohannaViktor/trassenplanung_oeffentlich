@@ -554,36 +554,9 @@ result = st.session_state.routing_result
 
 if result is not None:
 
-    st.subheader("1. Routing-Status")
+    
 
-    st.write(
-        f"Route von **{result['start_station']}** nach **{result['ziel_station']}**"
-    )
-
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Geladene Kanten", result["kanten_count"])
-    col2.metric("Geladene Knoten", result["knoten_count"])
-    col3.metric("Komponenten", result["n_components"])
-
-    col4, col5, col6 = st.columns(3)
-    col4.metric("Gematchte Kanten", result["matched_edges"])
-    col5.metric("Übersprungene Kanten", result["skipped_edges"])
-    col6.metric("Hauptkomponente Kanten", result["main_component_edges"])
-
-    col7, col8 = st.columns(2)
-    col7.metric("Start-Abstand zum Graph", f"{result['start_dist']:.1f} m")
-    col8.metric("Ziel-Abstand zum Graph", f"{result['ziel_dist']:.1f} m")
-
-    st.subheader("2. Routenvergleich")
-
-    st.dataframe(
-        result["routes_gdf"][
-            ["route_id", "length_m", "length_km", "cost"]
-        ],
-        use_container_width=True,
-    )
-
-    st.subheader("3. Karte")
+    st.subheader("1. Karte")
 
     kanten_small = result["kanten_small"]
     routes_gdf = result["routes_gdf"]
@@ -626,9 +599,9 @@ if result is not None:
 
     route_colors = [
         "#d7191c",
-        "#fdae61",
-        "#ffff80",
-        "#a6d96a",
+        "#2b83ba",
+        "#2b83ba",
+        "#2b83ba",
         "#2b83ba",
     ]
 
@@ -684,6 +657,40 @@ if result is not None:
         width=1400,
         height=850,
         returned_objects=[]
+    )
+
+    st.subheader("2. Routing-Status")
+
+    st.caption(
+        f"Route von {result['start_station']} → {result['ziel_station']}"
+    )
+
+    status_df = pd.DataFrame(
+        {
+            "Geladene Kanten": [result["kanten_count"]],
+            "Geladene Knoten": [result["knoten_count"]],
+            "Komponenten": [result["n_components"]],
+            "Gematchte Kanten": [result["matched_edges"]],
+            "Übersprungene Kanten": [result["skipped_edges"]],
+            "HK Kanten": [result["main_component_edges"]],
+            "Start Dist (m)": [round(result["start_dist"], 1)],
+            "Ziel Dist (m)": [round(result["ziel_dist"], 1)],
+        }
+    )
+
+    st.dataframe(
+        status_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.subheader("3. Routenvergleich")
+
+    st.dataframe(
+        result["routes_gdf"][
+            ["route_id", "length_m", "length_km", "cost"]
+        ],
+        use_container_width=True,
     )
 
 else:
